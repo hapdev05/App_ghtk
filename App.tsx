@@ -1,15 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
-import { styled } from 'nativewind';
+import AppNavigator from './src/navigation/AppNavigator';
+import { StyleSheet } from 'react-native';
 
-const StyledView = styled(View)
-const StyledText = styled(Text)
+// Import for NativeWind
+import 'nativewind';
 
 export default function App() {
   return (
-    <StyledView className="flex-1 items-center justify-center bg-white">
-      <StyledText className="text-xl font-bold text-red-600">NativeWind is now installed!</StyledText>
+    <>
       <StatusBar style="auto" />
-    </StyledView>
+      <AppNavigator />
+    </>
   );
 }
