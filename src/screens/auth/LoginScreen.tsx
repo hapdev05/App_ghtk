@@ -1,26 +1,28 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, Alert } from 'react-native'
 import shape from '../../assets/images/shape.png'
 import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
+import { login } from '../../services/auth.service'
 
 const LoginScreen = () => {
   const navigation = useNavigation<any>();
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [emailError, setEmailError] = useState('')
+  const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const validateEmail = (email: string) => {
-    if (!email) {
-      setEmailError('Email is required')
+  const validateUsername = (username: string) => {
+    if (!username) {
+      setUsernameError('Username is required')
       return false
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError('Please enter a valid email address')
+    if (username.length < 3) {
+      setUsernameError('Username must be at least 3 characters')
       return false
     }
-    setEmailError('')
+    setUsernameError('')
     return true
   }
 
@@ -39,30 +41,65 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     setLoginError('')
-    const isEmailValid = validateEmail(email)
+    const isUsernameValid = validateUsername(username)
     const isPasswordValid = validatePassword(password)
 
-    if (!isEmailValid || !isPasswordValid) {
+    if (!isUsernameValid || !isPasswordValid) {
       return
     }
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      navigation.navigate('Home')
-    } catch (err) {
-      setLoginError('Failed to login. Please try again.')
+      setIsLoading(true)
+      const response = await login({ username, password })
+      setIsLoading(false)
+
+      console.log('Login response:', response);
+
+      if (!response.user) {
+        throw new Error('Invalid response from server');
+      }
+
+      // Lấy role từ response API
+      const userRole = response.user.role || 'customer';
+      
+      // Điều hướng dựa vào role
+      switch(userRole) {
+        case 'admin':
+          navigation.navigate('AdminDashboard');
+          break;
+        case 'customer':
+          navigation.navigate('CustomerHome');
+          break;
+        case 'shipper':
+          navigation.navigate('ShipperDashboard');
+          break;
+        default:
+          navigation.navigate('CustomerHome');
+      }
+      
+      // Log thông tin để debug
+      console.log('Login Success:', {
+        role: userRole,
+        username: response.user.userName
+      });
+      
+    } catch (err: any) {
+      setIsLoading(false)
+      setLoginError(err.message || 'Failed to login. Please try again.')
+      Alert.alert('Login Error', err.message || 'Failed to login. Please try again.')
     }
   }
 
-  const handleEmailChange = (text: string) => {
-    setEmail(text)
-    if (emailError) validateEmail(text)
+  const handleUsernameChange = (text: string) => {
+    setUsername(text)
+    if (usernameError) validateUsername(text)
   }
 
   const handlePasswordChange = (text: string) => {
     setPassword(text)
     if (passwordError) validatePassword(text)
   }
+
   return (
     <View className="flex-1 bg-white">
       <View className="w-full">
@@ -75,16 +112,16 @@ const LoginScreen = () => {
 
       <View className="px-12 mt-10 space-y-6">
         <View className="space-y-2" >
-          <Text className="text-gray-600 text-base ml-4">Email</Text>
+          <Text className="text-gray-600 text-base ml-4">Username</Text>
           <TextInput 
-            placeholder="Enter your email"
+            placeholder="Enter your username"
             className="bg-gray-100 rounded-full px-6 py-3 text-base"
             placeholderTextColor="#999"
-            value={email}
-            onChangeText={handleEmailChange}
-            
+            value={username}
+            onChangeText={handleUsernameChange}
+            autoCapitalize="none"
           />
-          {emailError && (<Text className="text-red-500 text-xs">{emailError}</Text>)}
+          {usernameError && (<Text className="text-red-500 text-xs">{usernameError}</Text>)}
         </View>
 
         <View className="space-y-2">
@@ -103,9 +140,15 @@ const LoginScreen = () => {
           <Text className="text-blue-500 text-right mr-4" onPress={()=>navigation.navigate("Forgot")}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="bg-blue-500 rounded-full py-4" onPress={handleLogin}>
+        {loginError && (<Text className="text-red-500 text-xs text-center">{loginError}</Text>)}
+        
+        <TouchableOpacity 
+          className={`${isLoading ? 'bg-blue-300' : 'bg-blue-500'} rounded-full py-4`} 
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
           <Text className="text-white text-center text-lg font-semibold">
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </Text>
         </TouchableOpacity>
         <View className="flex-row justify-center mt-6">

@@ -9,6 +9,11 @@ interface RegisterData {
   idUser?: string; 
 }
 
+interface LoginData {
+  username: string;
+  password: string;
+}
+
 export const register = async (data: RegisterData) => {
   console.log('🚀 Calling Register API:', {
     url: `${API_URL}/register`,
@@ -34,16 +39,34 @@ export const register = async (data: RegisterData) => {
 
     return response.data;
   } catch (error: any) {
-    if (error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    } else if (error.response?.status === 400) {
-      throw new Error('Dữ liệu đăng ký không hợp lệ');
-    } else if (error.response?.status === 409) {
-      throw new Error('Email hoặc username đã tồn tại');
-    } else if (!error.response) {
-      throw new Error('Không thể kết nối đến server');
-    } else {
-      throw new Error('Lỗi đăng ký: ' + (error.response?.data?.message || error.message));
+    throw new Error(error.message);
+  }
+}
+
+export const login = async (data: LoginData) => {
+  console.log('🚀 Calling Login API:', {
+    url: `${API_URL}/login`,
+    data: { username: data.username, password: '****' }
+  });
+  
+  try {
+    const response = await axios.post(`${API_URL}/login`, {
+      userName: data.username,
+      password: data.password
+    });
+
+    console.log('✅ Login Success:', {
+      status: response.status,
+      data: response.data
+    });
+    
+    if (response.data.error) {
+      throw new Error(response.data.error);
     }
+
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Login Error:', error);
+    throw error;
   }
 }
