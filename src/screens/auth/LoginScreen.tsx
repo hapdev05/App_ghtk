@@ -3,6 +3,7 @@ import shape from '../../assets/images/shape.png'
 import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
 import { login } from '../../services/auth.service'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const LoginScreen = () => {
   const navigation = useNavigation<any>();
@@ -40,23 +41,21 @@ const LoginScreen = () => {
   }
 
   const handleLogin = async () => {
-    setLoginError('')
-    const isUsernameValid = validateUsername(username)
-    const isPasswordValid = validatePassword(password)
-
-    if (!isUsernameValid || !isPasswordValid) {
+    if (!username || !password) {
+      setLoginError('Please enter both username and password')
       return
     }
 
+    setIsLoading(true)
+    setLoginError('')
+
     try {
-      setIsLoading(true)
-      const response = await login({ username, password })
+      const response = await login(username, password)
       setIsLoading(false)
 
-      console.log('Login response:', response);
-
-      if (!response.user) {
-        throw new Error('Invalid response from server');
+      // Lưu token vào AsyncStorage
+      if (response.token) {
+        await AsyncStorage.setItem('userToken', response.token)
       }
 
       // Lấy role từ response API
@@ -80,7 +79,8 @@ const LoginScreen = () => {
       // Log thông tin để debug
       console.log('Login Success:', {
         role: userRole,
-        username: response.user.userName
+        username: response.user.userName,
+        token: response.token ? 'Token received' : 'No token'
       });
       
     } catch (err: any) {

@@ -23,7 +23,6 @@ export const register = async (data: RegisterData) => {
   try {
     const response = await axios.post(`${API_URL}/register`, {
       userName: data.username,
-      idUser: `user_${Date.now()}`,
       email: data.email,
       password: data.password
     });
@@ -39,20 +38,21 @@ export const register = async (data: RegisterData) => {
 
     return response.data;
   } catch (error: any) {
-    throw new Error(error.message);
+    console.error('❌ Register Error:', error);
+    throw error;
   }
-}
+};
 
-export const login = async (data: LoginData) => {
+export const login = async (username: string, password: string) => {
   console.log('🚀 Calling Login API:', {
     url: `${API_URL}/login`,
-    data: { username: data.username, password: '****' }
+    data: { username, password: '****' }
   });
   
   try {
     const response = await axios.post(`${API_URL}/login`, {
-      userName: data.username,
-      password: data.password
+      userName: username,
+      password: password
     });
 
     console.log('✅ Login Success:', {
@@ -69,4 +69,4 @@ export const login = async (data: LoginData) => {
     console.error('❌ Login Error:', error);
     throw error;
   }
-}
+};

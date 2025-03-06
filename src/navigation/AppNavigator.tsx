@@ -6,7 +6,7 @@ import RegisterScreen from '../screens/auth/RegisterSreen';
 import IntroScreen from '../screens/Page/IntroScreen';
 import ForgotPassword from '../screens/auth/ForgotPassword';
 import ResetPassword from '../screens/auth/ResetPassword';
-import AdminDashboard from '../screens/Page/Admin/AdminDashboard';
+import AdminLayout from '../screens/Page/Admin/AdminLayout';
 import ShipperDashboard from '../screens/Page/Shipper/ShipperDashboard';
 import CustomerHome from '../screens/Page/Customer/CustomerHome';
 
@@ -48,7 +48,7 @@ export default function AppNavigator() {
         />
         <Stack.Screen
           name='AdminDashboard'
-          component={AdminDashboard}
+          component={AdminLayout}
           options={{headerShown:false}}
         />
         <Stack.Screen
@@ -61,7 +61,6 @@ export default function AppNavigator() {
           component={CustomerHome}
           options={{headerShown:false}}
         />
-        
       </Stack.Navigator>
     </NavigationContainer>
   );
