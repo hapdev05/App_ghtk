@@ -21,21 +21,25 @@ const AdminMenu = () => {
   const navigation = useNavigation();
 
   return (
-    <View className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="bg-blue-600 p-6 pb-8">
-        <Text className="text-2xl font-bold text-white">Admin Dashboard</Text>
-        <Text className="text-white opacity-80">Manage your application</Text>
+    <View className="flex-1 bg-gray-100 pt-10">
+      <View className="bg-blue-600 p-4">
+        <Text className="text-2xl font-bold text-white mb-1">Admin Dashboard</Text>
+        <Text className="text-white text-opacity-80">Manage your application</Text>
       </View>
 
-      {/* Menu Grid */}
       <View className="px-4 -mt-4">
         <View className="flex-row flex-wrap justify-between">
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
               className="bg-white w-[48%] rounded-xl p-4 mb-4 shadow-sm"
-              onPress={() => navigation.navigate(item.id as never)}
+              onPress={() => {
+                if (item.id === 'users') {
+                  navigation.navigate('Users' as never);
+                } else {
+                  
+                }
+              }}
             >
               <View className="bg-blue-50 w-12 h-12 rounded-full items-center justify-center mb-3">
                 <Ionicons name={item.icon} size={24} color="#2563EB" />

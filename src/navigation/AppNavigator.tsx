@@ -9,6 +9,7 @@ import ResetPassword from '../screens/auth/ResetPassword';
 import AdminLayout from '../screens/Page/Admin/AdminLayout';
 import ShipperDashboard from '../screens/Page/Shipper/ShipperDashboard';
 import CustomerHome from '../screens/Page/Customer/CustomerHome';
+import AdminDashboard from '../screens/Page/Admin/AdminDashboard';
 
 const Stack = createNativeStackNavigator();
 
