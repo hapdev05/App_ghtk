@@ -79,7 +79,7 @@ const RegisterScreen = () => {
       </View>
       
       <View className="pl-12">
-        <Text className="text-4xl font-bold pl-8 pt-20">Register SFlash</Text>
+        <Text className="text-4xl font-bold pl-8 pt-10">Register SFlash</Text>
       </View>
 
       <View className="px-12 mt-10 space-y-6">
