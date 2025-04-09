@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://192.168.1.17:3000/api'; // Thay x.x bằng địa chỉ IP thực của bạn
+const API_URL = 'http://10.0.2.2:3000/api'; // Thay x.x bằng địa chỉ IP thực của bạn
 
 interface RegisterData {
   email: string;
