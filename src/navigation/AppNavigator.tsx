@@ -6,6 +6,11 @@ import RegisterScreen from '../screens/auth/RegisterSreen';
 import IntroScreen from '../screens/Page/IntroScreen';
 import ForgotPassword from '../screens/auth/ForgotPassword';
 import ResetPassword from '../screens/auth/ResetPassword';
+import AdminLayout from '../screens/Page/Admin/AdminLayout';
+import ShipperDashboard from '../screens/Page/Shipper/ShipperDashboard';
+import CustomerHome from '../screens/Page/Customer/CustomerHome';
+import AdminDashboard from '../screens/Page/Admin/AdminDashboard';
+import CreateOrder from '../screens/Page/Customer/components/CreateOrder';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +46,26 @@ export default function AppNavigator() {
         <Stack.Screen
           name='ResetPassword'
           component={ResetPassword}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='AdminDashboard'
+          component={AdminLayout}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='ShipperDashboard'
+          component={ShipperDashboard}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='CustomerHome'
+          component={CustomerHome}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='CreateOrder'
+          component={CreateOrder}
           options={{headerShown:false}}
         />
       </Stack.Navigator>
