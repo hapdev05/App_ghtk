@@ -1,12 +1,17 @@
 import axios from 'axios';
 
-const API_URL = 'http://10.0.2.2:3000/api';
+const API_URL = 'https://e1cc-2001-ee0-4b4b-d9e0-d429-cb71-1b7-5670.ngrok-free.app/api'; 
 
 interface RegisterData {
   email: string;
   password: string;
   username: string; 
   idUser?: string; 
+}
+
+interface LoginData {
+  username: string;
+  password: string;
 }
 
 export const register = async (data: RegisterData) => {
@@ -18,7 +23,6 @@ export const register = async (data: RegisterData) => {
   try {
     const response = await axios.post(`${API_URL}/register`, {
       userName: data.username,
-      idUser: `user_${Date.now()}`,
       email: data.email,
       password: data.password
     });
@@ -34,16 +38,34 @@ export const register = async (data: RegisterData) => {
 
     return response.data;
   } catch (error: any) {
-    if (error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    } else if (error.response?.status === 400) {
-      throw new Error('Dữ liệu đăng ký không hợp lệ');
-    } else if (error.response?.status === 409) {
-      throw new Error('Email hoặc username đã tồn tại');
-    } else if (!error.response) {
-      throw new Error('Không thể kết nối đến server');
-    } else {
-      throw new Error('Lỗi đăng ký: ' + (error.response?.data?.message || error.message));
-    }
+    console.error('❌ Register Error:', error);
+    throw error;
   }
-}
+};
+
+export const login = async (username: string, password: string) => {
+  console.log('🚀 Calling Login API:', {
+    url: `${API_URL}/login`,
+    data: { username, password: '****' }
+  });
+  
+  try {
+    const response = await axios.post(`${API_URL}/login`, {
+      userName: username,
+      password: password
+    });
+
+    console.log('✅ Login Success:', {
+      status: response.status,
+      data: response.data
+    });
+    
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
