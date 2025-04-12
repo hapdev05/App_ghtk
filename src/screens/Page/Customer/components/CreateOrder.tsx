@@ -32,6 +32,7 @@ const CreateOrder = () => {
   const [recipientAddress, setRecipientAddress] = useState('')
   const [price, setPrice] = useState('')
   const [packagePhotos, setPackagePhotos] = useState<string[]>([])
+  const [username, setUsername] = useState('')
 
   // Validation state
   const [errors, setErrors] = useState({
@@ -136,6 +137,7 @@ const CreateOrder = () => {
                 const orderData = {
                   orderName,
                   description,
+                  username,
                   sender: {
                     name: senderName,
                     phone: senderPhone,
