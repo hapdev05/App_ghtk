@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://10.0.2.2:3000/api'; // Thay x.x bằng địa chỉ IP thực của bạn
+const API_URL = 'https://e1cc-2001-ee0-4b4b-d9e0-d429-cb71-1b7-5670.ngrok-free.app/api'; 
 
 interface RegisterData {
   email: string;
@@ -66,7 +66,6 @@ export const login = async (username: string, password: string) => {
 
     return response.data;
   } catch (error: any) {
-    console.error('❌ Login Error:', error);
     throw error;
   }
 };

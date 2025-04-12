@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StatusBar, Alert, Image, Platform } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StatusBar, Alert, Image, Platform, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import * as ImagePicker from 'expo-image-picker'
+import { createOrder } from '../../../../services/order.service'
 
 const CreateOrder = () => {
   const navigation = useNavigation<any>()
@@ -43,6 +44,9 @@ const CreateOrder = () => {
     recipientAddress: '',
     price: ''
   })
+
+  // State for loading indicator
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Handle form submission
   const handleSubmit = () => {
@@ -124,32 +128,48 @@ const CreateOrder = () => {
           },
           {
             text: 'Xác nhận',
-            onPress: () => {
-              // Here you would typically send data to API
-              console.log({
-                orderName,
-                description,
-                sender: {
-                  name: senderName,
-                  phone: senderPhone,
-                  address: senderAddress
-                },
-                recipient: {
-                  name: recipientName,
-                  phone: recipientPhone,
-                  address: recipientAddress
-                },
-                price: Number(price),
-                packagePhotos
-              })
-              
-              // Show success message
-              Alert.alert('Thành công', 'Đơn hàng đã được tạo thành công', [
-                {
-                  text: 'OK',
-                  onPress: () => navigation.navigate('CustomerHome')
+            onPress: async () => {
+              try {
+                setIsSubmitting(true)
+                
+                // Chuẩn bị dữ liệu đơn hàng
+                const orderData = {
+                  orderName,
+                  description,
+                  sender: {
+                    name: senderName,
+                    phone: senderPhone,
+                    address: senderAddress
+                  },
+                  recipient: {
+                    name: recipientName,
+                    phone: recipientPhone,
+                    address: recipientAddress
+                  },
+                  price: Number(price),
+                  packagePhotos
                 }
-              ])
+                
+                // Gọi API tạo đơn hàng
+                const response = await createOrder(orderData)
+                
+                // Hiển thị thông báo thành công
+                Alert.alert('Thành công', 'Đơn hàng đã được tạo thành công', [
+                  {
+                    text: 'OK',
+                    onPress: () => navigation.navigate('CustomerHome')
+                  }
+                ])
+              } catch (error: any) {
+                // Xử lý lỗi
+                console.error('Lỗi khi tạo đơn hàng:', error)
+                Alert.alert(
+                  'Lỗi',
+                  error.message || 'Không thể tạo đơn hàng. Vui lòng thử lại sau.'
+                )
+              } finally {
+                setIsSubmitting(false)
+              }
             }
           }
         ]
@@ -402,10 +422,15 @@ const CreateOrder = () => {
       {/* Submit Button */}
       <View className="p-4 bg-white shadow-lg">
         <TouchableOpacity 
-          className="bg-blue-500 py-3 rounded-lg items-center"
+          className={`bg-blue-500 py-3 rounded-lg items-center ${isSubmitting ? 'opacity-70' : ''}`}
           onPress={handleSubmit}
+          disabled={isSubmitting}
         >
-          <Text className="text-white font-bold text-lg">Tạo đơn hàng</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="white" size="small" />
+          ) : (
+            <Text className="text-white font-bold text-lg">Tạo đơn hàng</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

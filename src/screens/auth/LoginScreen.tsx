@@ -85,8 +85,7 @@ const LoginScreen = () => {
       
     } catch (err: any) {
       setIsLoading(false)
-      setLoginError(err.message || 'Failed to login. Please try again.')
-      Alert.alert('Login Error', err.message || 'Failed to login. Please try again.')
+      Alert.alert( 'Failed to login. Please try again.')
     }
   }
 
