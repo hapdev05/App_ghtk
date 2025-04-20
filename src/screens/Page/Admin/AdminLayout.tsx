@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AdminMenu from './AdminMenu';
 import AdminDashboard from './AdminDashboard';
+import AdminOrders from './AdminOrders';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +43,7 @@ const AdminLayout = () => {
       <Tab.Screen name="Users" component={AdminDashboard} />
       <Tab.Screen 
         name="Orders" 
-        component={PlaceholderScreen}
+        component={AdminOrders}
         options={{
           tabBarBadge: 3,
         }}
@@ -53,7 +54,7 @@ const AdminLayout = () => {
 };
 
 const PlaceholderScreen = () => (
-  <View className="flex-1 justify-center items-center bg-gray-50">
+  <View className="flex-1 justify-center flex items-center bg-gray-50">
     <Text className="text-lg text-gray-600">Coming Soon</Text>
   </View>
 );

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { setAuthToken, checkAsyncStorage } from '../config/auth.config'; // Import setAuthToken và checkAsyncStorage
 
-const API_URL = 'https://e1cc-2001-ee0-4b4b-d9e0-d429-cb71-1b7-5670.ngrok-free.app/api';
+const API_URL = 'https://bf55-2001-ee0-4b4b-d9e0-7c49-b62c-bdac-7a16.ngrok-free.app/api';
 
 interface RegisterData {
   email: string;

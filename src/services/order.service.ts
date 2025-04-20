@@ -4,7 +4,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { getAuthToken } from '../config/auth.config';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'https://e1cc-2001-ee0-4b4b-d9e0-d429-cb71-1b7-5670.ngrok-free.app/api';
+const API_URL = 'https://bf55-2001-ee0-4b4b-d9e0-7c49-b62c-bdac-7a16.ngrok-free.app/api';
 
 interface DecodedToken {
   userId: number;
@@ -93,11 +93,11 @@ export const createOrder = async (orderData: OrderData) => {
         const fileInfo = await FileSystem.getInfoAsync(photoUri);
 
         if (fileInfo.exists) {
-          // Nén ảnh với kích thước nhỏ hơn và tỷ lệ nén cao hơn
+          // Nén ảnh với kích thước và chất lượng thấp hơn
           const manipResult = await ImageManipulator.manipulateAsync(
             photoUri,
-            [{ resize: { width: 800 } }],
-            { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+            [{ resize: { width: 600, height: 600 } }],
+            { compress: 0.3, format: ImageManipulator.SaveFormat.JPEG }
           );
 
           const base64 = await FileSystem.readAsStringAsync(manipResult.uri, {
@@ -163,6 +163,51 @@ export const createOrder = async (orderData: OrderData) => {
  * Lấy danh sách đơn hàng
  * @returns Danh sách đơn hàng
  */
+/**
+ * Lấy chi ngtiết đơn hà
+ * @param orderId ID của đơn hàng
+ * @returns Chi tiết đơn hàng
+ */
+export const getOrderDetail = async (orderId: number) => {
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      console.error('Token không tồn tại trong AsyncStorage');
+      throw new Error('Vui lòng đăng nhập để thực hiện chức năng này');
+    }
+
+    const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.status >= 400) {
+      throw new Error(response.data.message || 'Lỗi khi lấy chi tiết đơn hàng');
+    }
+
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+
+    // Chuyển đổi base64 thành URI cho hình ảnh
+    const orderData = response.data;
+    if (orderData.packagePhotos && orderData.packagePhotos.length > 0) {
+      orderData.packagePhotos = orderData.packagePhotos.map((base64String: string) => {
+        if (!base64String.startsWith('data:image')) {
+          return `data:image/jpeg;base64,${base64String}`;
+        }
+        return base64String;
+      });
+    }
+
+    return orderData;
+  } catch (error) {
+    console.error('❌ Get Order Detail Error:', error);
+    throw error;
+  }
+};
+
 export const getOrders = async () => {
   try {
     const token = await getAuthToken();
