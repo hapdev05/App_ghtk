@@ -11,7 +11,7 @@ import {
   ScrollView
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { getAdminOrders, updateOrderStatus, assignShipper, approveOrder, cancelOrder, getAllUsers } from '../../../services/admin.service';
+import { getShipperOrders, updateOrderStatus } from "../../../services/shipper.service";
 
 interface Order {
   orderId: number;
@@ -30,16 +30,16 @@ interface Order {
     phone: string;
     address: string;
   };
+  createdAt: string;
+  description: string;
 }
 
-const AdminOrders = () => {
+const ShipperOrderManagement = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [shipperModalVisible, setShipperModalVisible] = useState(false);
-  const [availableShippers, setAvailableShippers] = useState<any[]>([]);
 
   const getFullPhotoUrl = (photoUrl: string) => {
     if (photoUrl.startsWith('http')) return photoUrl;
@@ -52,21 +52,22 @@ const AdminOrders = () => {
 
   const loadOrders = async () => {
     try {
-      const orders = await getAdminOrders();
-      console.log('✅ Orders data:', {
-        count: orders?.length || 0,
-        firstOrder: orders[0],
-        hasPhotos: orders[0]?.packagePhotos?.length > 0,
-        photoUrls: orders[0]?.packagePhotos
-      });
-      setOrders(orders);
+      const response = await getShipperOrders();
+      // Đảm bảo luôn truyền đúng mảng đơn hàng vào state
+      if (Array.isArray(response)) {
+        setOrders(response);
+      } else if (response && Array.isArray(response.orders)) {
+        setOrders(response.orders);
+      } else {
+        setOrders([]);
+      }
     } catch (error) {
       console.error('❌ Error loading orders:', error);
       Alert.alert('Lỗi', 'Không thể tải danh sách đơn hàng');
     } finally {
       setLoading(false);
     }
-  };
+  } 
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -89,30 +90,16 @@ const AdminOrders = () => {
     }
   };
 
-  const handleAssignShipper = async (orderId: number, shipperId: number) => {
-    try {
-      await assignShipper(orderId, shipperId);
-      await loadOrders();
-      setShipperModalVisible(false);
-      Alert.alert('Thành công', 'Đã phân công shipper');
-    } catch (error) {
-      console.error('Error assigning shipper:', error);
-      Alert.alert('Lỗi', 'Không thể phân công shipper');
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Chờ xác nhận':
-        return 'text-amber-500';
       case 'Đã xác nhận':
-        return 'text-green-500';
+        return 'text-green-600 bg-green-100';
       case 'Đang giao':
-        return 'text-blue-500';
+        return 'text-blue-600 bg-blue-100';
       case 'Đã giao':
-        return 'text-green-500';
+        return 'text-green-600 bg-green-100';
       case 'Đã huỷ':
-        return 'text-red-500';
+        return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-900';
     }
@@ -121,15 +108,29 @@ const AdminOrders = () => {
   const renderOrderItem = ({ item }: { item: Order }) => (
     <View className="bg-white p-4 mx-3 my-1.5 rounded-xl shadow-sm">
       <View className="flex flex-row justify-between items-center mb-3 pb-2 border-b border-gray-100 border-solid">
-        <Text className="text-lg font-bold text-gray-900">{item.orderName}</Text>
-        <Text className={`px-2.5 py-1 rounded-full bg-gray-50 ${getStatusColor(item.status)}`}>
+        <View>
+          <Text className="text-lg font-bold text-gray-900">{item.orderName}</Text>
+          <Text className="text-sm text-gray-500 mt-1">Mã đơn: {item.orderId}</Text>
+        </View>
+        <Text className={`px-3 py-1.5 rounded-full ${getStatusColor(item.status)} bg-opacity-10 font-medium`}>
           {item.status}
         </Text>
       </View>
 
-      <Text className="text-base text-gray-700 mb-1.5">Mã đơn: #{item.orderId}</Text>
-      <Text className="text-base text-gray-700 mb-1.5">Người đặt: {item.username}</Text>
-      <Text className="text-base text-gray-700 mb-3">Giá: {item.price.toLocaleString()}đ</Text>
+      <View className="mb-4">
+        <View className="flex flex-row items-center mb-2">
+          <MaterialIcons name="person" size={18} color="#4B5563" />
+          <Text className="text-base text-gray-700 ml-2">Người đặt: {item.username}</Text>
+        </View>
+        <View className="flex flex-row items-center mb-2">
+          <MaterialIcons name="local-shipping" size={18} color="#4B5563" />
+          <Text className="text-base text-gray-700 ml-2">Địa chỉ giao: {item.recipient.address}</Text>
+        </View>
+        <View className="flex flex-row items-center">
+          <MaterialIcons name="attach-money" size={18} color="#4B5563" />
+          <Text className="text-base text-gray-700 ml-2">Giá: {item.price.toLocaleString()}đ</Text>
+        </View>
+      </View>
 
       <View className="flex flex-row justify-end items-center pt-2 border-t border-gray-100 border-solid">
         <TouchableOpacity
@@ -143,50 +144,23 @@ const AdminOrders = () => {
           <Text className="text-white font-semibold ml-1.5">Chi tiết</Text>
         </TouchableOpacity>
 
-        {item.status === 'Chờ xác nhận' && (
-          <TouchableOpacity
-            className="flex flex-row items-center bg-green-500 px-3 py-2 rounded-lg"
-            onPress={() => handleUpdateOrderStatus(item.orderId, 'Đã xác nhận')}
-          >
-            <MaterialIcons name="check" size={20} color="#fff" />
-            <Text className="text-white font-semibold ml-1.5">Xác nhận</Text>
-          </TouchableOpacity>
-        )}
-
         {item.status === 'Đã xác nhận' && (
           <TouchableOpacity
             className="flex flex-row items-center bg-blue-500 px-3 py-2 rounded-lg"
-            onPress={async () => {
-              try {
-                const users = await getAllUsers();
-                const shippers = users.filter((user:any) => user.role === 'shipper');
-                setAvailableShippers(shippers);
-                setSelectedOrder(item);
-                setShipperModalVisible(true);
-              } catch (error) {
-                console.error('Error loading shippers:', error);
-                Alert.alert('Lỗi', 'Không thể tải danh sách shipper');
-              }
-            }}
+            onPress={() => handleUpdateOrderStatus(item.orderId, 'Đang giao')}
           >
             <MaterialIcons name="local-shipping" size={20} color="#fff" />
-            <Text className="text-white font-semibold ml-1.5">Phân công</Text>
+            <Text className="text-white font-semibold ml-1.5">Bắt đầu giao</Text>
           </TouchableOpacity>
         )}
 
-        {(item.status === 'Chờ xác nhận' || item.status === 'Đã xác nhận' || item.status === 'Đang giao') && (
+        {item.status === 'Đang giao' && (
           <TouchableOpacity
-            className="flex flex-row items-center bg-red-500 px-3 py-2 rounded-lg"
-            onPress={() => cancelOrder(item.orderId)}
+            className="flex flex-row items-center bg-green-500 px-3 py-2 rounded-lg"
+            onPress={() => handleUpdateOrderStatus(item.orderId, 'Đã giao')}
           >
-            <MaterialIcons name="cancel" size={20} color="#fff" />
-            <Text className="text-white font-semibold ml-1.5">Hủy đơn</Text>
-          </TouchableOpacity>
-        )}
-
-        {item.status === 'Đã huỷ' && (
-          <TouchableOpacity
-          >  
+            <MaterialIcons name="check" size={20} color="#fff" />
+            <Text className="text-white font-semibold ml-1.5">Hoàn thành</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -195,18 +169,35 @@ const AdminOrders = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <FlatList
-        data={orders}
-        renderItem={renderOrderItem}
-        keyExtractor={(item) => item.orderId.toString()}
-        contentContainerStyle={{ paddingVertical: 8 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-          />
-        }
-      />
+      {loading ? (
+        <View className="flex-1 justify-center flex items-center">
+          <Text className="text-gray-600 text-lg">Đang tải...</Text>
+        </View>
+      ) : orders.length === 0 ? (
+        <View className="flex-1 justify-center flex items-center">
+          <MaterialIcons name="inbox" size={48} color="#9CA3AF" />
+          <Text className="text-gray-600 text-lg mt-4">Chưa có đơn hàng nào</Text>
+          <TouchableOpacity
+            className="mt-4 bg-blue-500 px-4 py-2 rounded-lg"
+            onPress={handleRefresh}
+          >
+            <Text className="text-white font-medium">Làm mới</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={orders}
+          renderItem={renderOrderItem}
+          keyExtractor={(item) => item.orderId.toString()}
+          contentContainerStyle={{ paddingVertical: 8 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
+          }
+        />
+      )}
 
       <Modal
         animationType="slide"
@@ -260,41 +251,8 @@ const AdminOrders = () => {
           </View>
         </View>
       </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={shipperModalVisible}
-        onRequestClose={() => setShipperModalVisible(false)}
-      >
-        <View className="flex-1 justify-center flex items-center bg-black/50">
-          <View className="bg-white w-11/12 rounded-2xl p-5 shadow-xl">
-            <Text className="text-xl font-bold text-gray-900 mb-4 text-center">Phân công shipper</Text>
-            {availableShippers.length > 0 ? (
-              availableShippers.map((shipper) => (
-                <TouchableOpacity
-                  key={shipper.idUser}
-                  className="p-3 border border-gray-200 border-solid rounded-lg mb-2 active:bg-gray-50"
-                  onPress={() => handleAssignShipper(selectedOrder?.orderId || 0, shipper.idUser)}
-                >
-                  <Text className="text-base font-semibold text-gray-800">{shipper.userName}</Text>
-                  <Text className="text-sm text-gray-600 mt-1">{shipper.email}</Text>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text className="text-center text-gray-600">Không có shipper nào khả dụng</Text>
-            )}
-            <TouchableOpacity
-              className="bg-red-500 py-3 rounded-lg mt-2"
-              onPress={() => setShipperModalVisible(false)}
-            >
-              <Text className="text-white font-bold text-center">Đóng</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
 
-export default AdminOrders;
+export default ShipperOrderManagement;

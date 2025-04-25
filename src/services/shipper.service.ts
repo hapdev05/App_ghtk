@@ -1,0 +1,99 @@
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = 'https://bf55-2001-ee0-4b4b-d9e0-7c49-b62c-bdac-7a16.ngrok-free.app/api';
+
+// Lấy danh sách đơn hàng được phân công cho shipper
+export const getShipperOrders = async () => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập để xem danh sách đơn hàng');
+    }
+
+    const response = await axios.get(`${API_URL}/shipper/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status >= 400) {
+      throw new Error(response.data.message || 'Lỗi khi lấy danh sách đơn hàng');
+    }
+
+    console.log('✅ Get Shipper Orders Success:', {
+      status: response.status,
+      count: response.data.length,
+      data: response.data
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error fetching shipper orders:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Không thể lấy danh sách đơn hàng');
+  }
+};
+
+// Cập nhật trạng thái đơn hàng
+export const updateOrderStatus = async (orderId: number, status: string) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập để cập nhật trạng thái đơn hàng');
+    }
+
+    const response = await axios.put(
+      `${API_URL}/shipper/orders/${orderId}/status`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status >= 400) {
+      throw new Error(response.data.message || 'Lỗi khi cập nhật trạng thái đơn hàng');
+    }
+
+    console.log('✅ Update Order Status Success:', {
+      status: response.status,
+      orderId,
+      newStatus: status
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error updating order status:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Không thể cập nhật trạng thái đơn hàng');
+  }
+};
+
+// Xem chi tiết đơn hàng
+export const getOrderDetails = async (orderId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập để xem chi tiết đơn hàng');
+    }
+
+    const response = await axios.get(`${API_URL}/shipper/orders/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status >= 400) {
+      throw new Error(response.data.message || 'Lỗi khi lấy chi tiết đơn hàng');
+    }
+
+    console.log('✅ Get Order Details Success:', {
+      status: response.status,
+      orderId
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error fetching order details:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Không thể lấy chi tiết đơn hàng');
+  }
+};

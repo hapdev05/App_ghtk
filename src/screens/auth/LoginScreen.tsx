@@ -150,7 +150,7 @@ const LoginScreen = () => {
             {isLoading ? 'Logging in...' : 'Login'}
           </Text>
         </TouchableOpacity>
-        <View className="flex-row justify-center mt-6">
+        <View className="flex flex-row justify-center mt-6">
           <Text className="text-gray-600">Don't have an account? </Text>
           <TouchableOpacity>
             <Text className="text-blue-500 font-semibold" onPress={()=>navigation.navigate('Register')}>Sign Up</Text>

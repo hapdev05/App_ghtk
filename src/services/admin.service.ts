@@ -154,7 +154,7 @@ export const updateOrderStatus = async (orderId: number, status: string) => {
       throw new Error('You are not logged in');
     }
 
-    const response = await axios.put(`${API_URL}/orders/${orderId}/status`, {
+    const response = await axios.put(`${API_URL}/order/${orderId}/status`, {
       status
     }, {
       headers: {
@@ -182,7 +182,7 @@ export const assignShipper = async (orderId: number, shipperId: number) => {
       throw new Error('You are not logged in');
     }
 
-    const response = await axios.put(`${API_URL}/orders/${orderId}/assign`, {
+    const response = await axios.put(`${API_URL}/order/${orderId}/assign`, {
       shipperId
     }, {
       headers: {
@@ -200,5 +200,57 @@ export const assignShipper = async (orderId: number, shipperId: number) => {
   } catch (error: any) {
     console.error('❌ Error assigning shipper:', error);
     throw new Error(error.response?.data?.error || error.message || 'Failed to assign shipper');
+  }
+};
+
+export const approveOrder = async (orderId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('You are not logged in');
+    }
+
+    const response = await axios.post(`${API_URL}/order/approve`, {
+      orderId
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    console.log('✅ Approve Order Success:', {
+      status: response.status,
+      orderId
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error approving order:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Failed to approve order');
+  }
+};
+
+export const cancelOrder = async (orderId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('You are not logged in');
+    }
+
+    const response = await axios.post(`${API_URL}/orders/${orderId}/cancel`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    console.log('✅ Cancel Order Success:', {
+      status: response.status,
+      orderId
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error canceling order:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Failed to cancel order');
   }
 };
