@@ -11,6 +11,7 @@ import ShipperDashboard from '../screens/Page/Shipper/ShipperDashboard';
 import CustomerHome from '../screens/Page/Customer/CustomerHome';
 import AdminDashboard from '../screens/Page/Admin/AdminDashboard';
 import CreateOrder from '../screens/Page/Customer/components/CreateOrder';
+import OrderHistory from '../screens/Page/Customer/components/OrderHistory';
 
 const Stack = createNativeStackNavigator();
 
@@ -68,7 +69,13 @@ export default function AppNavigator() {
           component={CreateOrder}
           options={{headerShown:false}}
         />
+        <Stack.Screen
+          name='OrderHistory'
+          component={OrderHistory}
+          options={{headerShown:false}}
+        />
       </Stack.Navigator>
+      
     </NavigationContainer>
   );
 }

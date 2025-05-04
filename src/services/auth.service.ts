@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { setAuthToken, checkAsyncStorage } from '../config/auth.config'; // Import setAuthToken và checkAsyncStorage
 
-const API_URL = 'https://bf55-2001-ee0-4b4b-d9e0-7c49-b62c-bdac-7a16.ngrok-free.app/api';
+const API_URL = 'https://ab52-14-245-65-79.ngrok-free.app/api';
 
 interface RegisterData {
   email: string;
@@ -77,7 +77,7 @@ export const login = async (username: string, password: string) => {
 
     return response.data;
   } catch (error: any) {
-    console.error('❌ Login Error:', error);
+    
     throw error;
   }
 };

@@ -4,7 +4,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { getAuthToken } from '../config/auth.config';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'https://bf55-2001-ee0-4b4b-d9e0-7c49-b62c-bdac-7a16.ngrok-free.app/api';
+const API_URL = 'https://ab52-14-245-65-79.ngrok-free.app/api';
 
 interface DecodedToken {
   userId: number;
