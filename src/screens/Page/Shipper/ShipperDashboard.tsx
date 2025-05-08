@@ -13,6 +13,8 @@ import ShipperOrderManagement from './ShipperOrderManagement';
 import { useNavigation } from '@react-navigation/native';
 import ShipperMenu from './ShipperMenu';
 import { logout } from '../../../services/auth.service';
+import Geolocation from '@react-native-community/geolocation';
+import { reverseGeoCode } from '../../../services/geocoding.service';
 
 interface Order {
   orderId: number;
@@ -38,12 +40,33 @@ const ShipperDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<string | null>(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     loadOrders();
   }, []);
-
+  
+  useEffect(() => {
+    Geolocation.getCurrentPosition(position => {
+      if (position.coords) {
+        fetchLocationAddress(position.coords.latitude, position.coords.longitude);
+      }
+    });
+  }, []);
+  
+  const fetchLocationAddress = async (lat: number, long: number) => {
+    try {
+      const result = await reverseGeoCode({ lat, long });
+      if (result) {
+        setCurrentLocation(result.address);
+        console.log('Current location:', result);
+      }
+    } catch (error) {
+      console.error('Error getting location address:', error);
+    }
+  };
+  
   const loadOrders = async () => {
     try {
       const orders = await getShipperOrders();
@@ -164,7 +187,7 @@ const ShipperDashboard = () => {
             <MaterialIcons name="person" size={28} color="#3B82F6" />
           </View>
           <View className="ml-4">
-            <Text className="text-xl font-bold text-gray-900">Nguyễn Văn A</Text>
+            <Text className="text-xl font-bold text-gray-900"></Text>
             <View className="flex-row items-center mt-1">
               <MaterialIcons name="local-shipping" size={18} color="#4B5563" />
               <Text className="text-gray-600 ml-2 text-base">Shipper</Text>

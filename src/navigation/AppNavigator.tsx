@@ -13,6 +13,7 @@ import AdminDashboard from '../screens/Page/Admin/AdminDashboard';
 import CreateOrder from '../screens/Page/Customer/components/CreateOrder';
 import OrderHistory from '../screens/Page/Customer/components/OrderHistory';
 import OrderDetailScreen from '../screens/Page/Customer/components/OrderDetailScreen';
+import LocationSearch from '../screens/Page/Shipper/LocationSearch';
 
 const Stack = createNativeStackNavigator();
 
@@ -78,6 +79,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name='OrderDetailScreen'
           component={OrderDetailScreen}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='LocationSearch'
+          component={LocationSearch}
           options={{headerShown:false}}
         />
       </Stack.Navigator>

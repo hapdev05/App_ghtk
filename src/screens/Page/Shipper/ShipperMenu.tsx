@@ -51,6 +51,14 @@ const ShipperMenu: React.FC<ShipperMenuProps> = ({ visible, onClose }) => {
       }
     },
     {
+      icon: 'location-searching',
+      title: 'Tìm kiếm địa điểm',
+      onPress: () => {
+        navigation.navigate('LocationSearch' as never);
+        onClose();
+      }
+    },
+    {
       icon: 'local-shipping',
       title: 'Đơn hàng đang giao',
       onPress: () => {
