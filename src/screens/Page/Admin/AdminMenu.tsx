@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { logout } from '../../../services/auth.service';
 
 type MenuItem = {
   id: string;
@@ -20,6 +21,82 @@ const menuItems: MenuItem[] = [
 const AdminMenu = () => {
   const navigation = useNavigation();
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Xác nhận đăng xuất',
+      'Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?',
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel'
+        },
+        {
+          text: 'Đăng xuất',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' as never }]
+              });
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleMenuPress = (itemId: string) => {
+    switch (itemId) {
+      case 'users':
+        navigation.navigate('Users' as never);
+        break;
+      case 'orders':
+        // Chuyển đến trang quản lý đơn hàng
+        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        break;
+      case 'delivery':
+        // Chuyển đến trang quản lý giao hàng
+        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        break;
+      case 'reports':
+        // Chuyển đến trang báo cáo
+        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        break;
+      case 'settings':
+        // Hiển thị menu cài đặt với tùy chọn đăng xuất
+        Alert.alert(
+          'Cài đặt',
+          'Chọn tùy chọn',
+          [
+            {
+              text: 'Cài đặt hệ thống',
+              onPress: () => Alert.alert('Thông báo', 'Chức năng đang phát triển')
+            },
+            {
+              text: 'Thông tin tài khoản',
+              onPress: () => Alert.alert('Thông báo', 'Chức năng đang phát triển')
+            },
+            {
+              text: 'Đăng xuất',
+              onPress: handleLogout,
+              style: 'destructive'
+            },
+            {
+              text: 'Hủy',
+              style: 'cancel'
+            }
+          ]
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <View className="flex-1 bg-gray-100 pt-10">
       <View className="bg-blue-600 p-4">
@@ -33,13 +110,7 @@ const AdminMenu = () => {
             <TouchableOpacity
               key={item.id}
               className="bg-white w-[48%] rounded-xl p-4 mb-4 shadow-sm"
-              onPress={() => {
-                if (item.id === 'users') {
-                  navigation.navigate('Users' as never);
-                } else {
-                  
-                }
-              }}
+              onPress={() => handleMenuPress(item.id)}
             >
               <View className="bg-blue-50 w-12 h-12 rounded-full items-center justify-center mb-3">
                 <Ionicons name={item.icon} size={24} color="#2563EB" />
@@ -71,14 +142,6 @@ const AdminMenu = () => {
           </View>
         </View>
       </View>
-      <TouchableOpacity 
-        className="mx-4 mt-6 bg-red-50 p-4 rounded-xl flex-row items-center"
-        onPress={() => {
-        }}
-      >
-        <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-        <Text className="ml-3 text-red-600 font-semibold">Logout</Text>
-      </TouchableOpacity>
     </View>
   );
 };

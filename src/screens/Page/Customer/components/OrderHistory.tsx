@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
@@ -10,13 +10,16 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { StatusBar } from 'expo-status-bar';
 import OrderItem from './OrderItem';
-import OrderDetail from './OrderDetail';
-import { getCustomerOrderDetails, getCustomerOrders } from '../../../../services/customer.service';
+import { getCustomerOrders } from '../../../../services/customer.service';
 
-
+type RootStackParamList = {
+  OrderDetailScreen: { orderId: number };
+  CreateOrder: undefined;
+};
 
 interface Order {
   orderId: number;
@@ -43,9 +46,7 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const fetchOrders = async () => {
     try {
@@ -72,21 +73,9 @@ const OrderHistory = () => {
     }, [])
   );
 
-  const viewOrderDetails = async (order: Order) => {
-    try {
-      setSelectedOrder(order);
-      setShowDetails(true);
-      
-      const details = await getCustomerOrderDetails(order.orderId);
-      setSelectedOrder(details);
-    } catch (error: any) {
-      Alert.alert('Lỗi', error.message || 'Không thể xem chi tiết đơn hàng');
-    }
-  };
-
-  const closeDetails = () => {
-    setShowDetails(false);
-    setSelectedOrder(null);
+  const viewOrderDetails = (order: Order) => {
+    // Chuyển đến màn hình OrderDetailScreen với orderId
+    navigation.navigate('OrderDetailScreen', { orderId: order.orderId });
   };
 
   const getStatusColor = (status: string) => {
@@ -156,20 +145,6 @@ const OrderHistory = () => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' đ';
   };
 
-  const renderOrderItem = ({ item }: { item: Order }) => (
-    <OrderItem
-      item={item}
-      onPress={viewOrderDetails}
-      getStatusColor={getStatusColor}
-      getStatusText={getStatusText}
-      getStatusIcon={getStatusIcon}
-      formatDate={formatDate}
-      formatPrice={formatPrice}
-    />
-  );
-
-
-
   if (loading && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
@@ -192,16 +167,13 @@ const OrderHistory = () => {
           <Text className="text-base text-gray-600 mt-3 mb-5">Bạn chưa có đơn hàng nào</Text>
           <TouchableOpacity
             className="bg-blue-500 px-5 py-3 rounded-lg"
-            onPress={() => navigation.navigate('CreateOrder' as never)}
+            onPress={() => navigation.navigate('CreateOrder')}
           >
             <Text className="text-white font-semibold">Tạo đơn hàng mới</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item.orderId.toString()}
-          renderItem={renderOrderItem}
+        <ScrollView
           className="p-4"
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -212,22 +184,23 @@ const OrderHistory = () => {
               tintColor="#3498db"
             />
           }
-        />
+        >
+          {orders.map((item) => (
+            <OrderItem
+              key={item.orderId.toString()}
+              item={item}
+              onPress={viewOrderDetails}
+              getStatusColor={getStatusColor}
+              getStatusText={getStatusText}
+              getStatusIcon={getStatusIcon}
+              formatDate={formatDate}
+              formatPrice={formatPrice}
+            />
+          ))}
+        </ScrollView>
       )}
-
-      <OrderDetail
-        visible={showDetails}
-        order={selectedOrder}
-        onClose={closeDetails}
-        getStatusColor={getStatusColor}
-        getStatusText={getStatusText}
-        getStatusIcon={getStatusIcon}
-        formatDate={formatDate}
-        formatPrice={formatPrice}
-      />
     </View>
   );
 };
-
 
 export default OrderHistory;

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { setAuthToken, checkAsyncStorage } from '../config/auth.config'; // Import setAuthToken và checkAsyncStorage
+import { setAuthToken, checkAsyncStorage, removeAuthToken } from '../config/auth.config'; // Import setAuthToken, checkAsyncStorage và removeAuthToken
 
-const API_URL = 'https://ab52-14-245-65-79.ngrok-free.app/api';
+const API_URL = 'https://fa6e-2001-ee0-4b49-c580-bc32-ded9-8e98-e594.ngrok-free.app/api';
 
 interface RegisterData {
   email: string;
@@ -78,6 +78,17 @@ export const login = async (username: string, password: string) => {
     return response.data;
   } catch (error: any) {
     
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await removeAuthToken();
+    console.log('✅ Logout Success: Token đã được xóa');
+    return true;
+  } catch (error: any) {
+    console.error('❌ Logout Error:', error);
     throw error;
   }
 };

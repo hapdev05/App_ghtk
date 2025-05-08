@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
+import AccountMenu from './components/AccountMenu'
 
 const CustomerHome = () => {
   const navigation = useNavigation<any>();
+  const [accountMenuVisible, setAccountMenuVisible] = useState(false);
 
   const menuItems = [
     {
@@ -68,7 +70,10 @@ const CustomerHome = () => {
             <Text className="text-2xl font-bold text-gray-800">Xin chào,</Text>
             <Text className="text-lg text-gray-600">Khách hàng</Text>
           </View>
-          <TouchableOpacity className="w-10 h-10 bg-gray-200 rounded-full justify-center items-center">
+          <TouchableOpacity 
+            className="w-10 h-10 bg-gray-200 rounded-full justify-center items-center"
+            onPress={() => setAccountMenuVisible(true)}
+          >
             <Text className="text-xl">👤</Text>
           </TouchableOpacity>
         </View>
@@ -111,7 +116,10 @@ const CustomerHome = () => {
           <Text className="text-2xl">🏠</Text>
           <Text className="text-xs font-medium text-blue-500">Trang chủ</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
+        <TouchableOpacity 
+          className="items-center"
+          onPress={() => navigation.navigate('OrderHistory')}
+        >
           <Text className="text-2xl">📦</Text>
           <Text className="text-xs text-gray-500">Đơn hàng</Text>
         </TouchableOpacity>
@@ -119,11 +127,20 @@ const CustomerHome = () => {
           <Text className="text-2xl">📊</Text>
           <Text className="text-xs text-gray-500">Thống kê</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
+        <TouchableOpacity 
+          className="items-center"
+          onPress={() => setAccountMenuVisible(true)}
+        >
           <Text className="text-2xl">👤</Text>
           <Text className="text-xs text-gray-500">Tài khoản</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Account Menu Modal */}
+      <AccountMenu 
+        visible={accountMenuVisible} 
+        onClose={() => setAccountMenuVisible(false)} 
+      />
     </View>
   )
 }

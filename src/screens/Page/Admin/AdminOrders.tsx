@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   Modal,
   RefreshControl,
@@ -43,7 +42,7 @@ const AdminOrders = () => {
 
   const getFullPhotoUrl = (photoUrl: string) => {
     if (photoUrl.startsWith('http')) return photoUrl;
-    return `https://ab52-14-245-65-79.ngrok-free.app/data/img/${photoUrl}`;
+    return `https://fa6e-2001-ee0-4b49-c580-bc32-ded9-8e98-e594.ngrok-free.app/data/img/${photoUrl}`;
   };
 
   useEffect(() => {
@@ -118,8 +117,8 @@ const AdminOrders = () => {
     }
   };
 
-  const renderOrderItem = ({ item }: { item: Order }) => (
-    <View className="bg-white p-4 mx-3 my-1.5 rounded-xl shadow-sm">
+  const renderOrderItem = (item: Order) => (
+    <View key={item.orderId} className="bg-white p-4 mx-3 my-1.5 rounded-xl shadow-sm">
       <View className="flex flex-row justify-between items-center mb-3 pb-2 border-b border-gray-100 border-solid">
         <Text className="text-lg font-bold text-gray-900">{item.orderName}</Text>
         <Text className={`px-2.5 py-1 rounded-full bg-gray-50 ${getStatusColor(item.status)}`}>
@@ -195,10 +194,7 @@ const AdminOrders = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <FlatList
-        data={orders}
-        renderItem={renderOrderItem}
-        keyExtractor={(item) => item.orderId.toString()}
+      <ScrollView
         contentContainerStyle={{ paddingVertical: 8 }}
         refreshControl={
           <RefreshControl
@@ -206,7 +202,9 @@ const AdminOrders = () => {
             onRefresh={handleRefresh}
           />
         }
-      />
+      >
+        {orders.map(item => renderOrderItem(item))}
+      </ScrollView>
 
       <Modal
         animationType="slide"
