@@ -10,7 +10,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   // Khởi tạo Google Maps SDK
-  [GMSServices provideAPIKey:@"AIzaSyCq1RS92yYF4kIwWxwH3UzBTlWGk_et89Q"];
+  [GMSServices provideAPIKey:@"AIzaSyADmymvFSG6kBAwbb0EkZWgwPwmRYiUCnY"];
   
   self.moduleName = @"main";
 
