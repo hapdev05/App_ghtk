@@ -13,6 +13,10 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
+# Cấu hình Google Maps
+pod 'GoogleMaps'
+pod 'Google-Maps-iOS-Utils'
+
 target 'SFlash' do
   use_expo_modules!
 

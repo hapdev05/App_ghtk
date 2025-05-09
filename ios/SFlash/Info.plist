@@ -62,6 +62,8 @@
     <string>Truy cập vị trí</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Ứng dụng cần quyền truy cập vị trí của bạn để hiển thị địa chỉ hiện tại</string>
+    <key>GoogleMapsApiKey</key>
+    <string>AIzaSyADmymvFSG6kBAwbb0EkZWgwPwmRYiUCnY</string>
     <key>UIRequiresFullScreen</key>
     <false/>
     <key>UIStatusBarStyle</key>

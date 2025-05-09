@@ -15,7 +15,7 @@ import ShipperMenu from './ShipperMenu';
 import { logout } from '../../../services/auth.service';
 import Geolocation from '@react-native-community/geolocation';
 import { reverseGeoCode } from '../../../services/geocoding.service';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 interface Order {
   orderId: number;
@@ -214,7 +214,7 @@ const ShipperDashboard = () => {
         <View className="px-5 pt-4">
           <Text className="text-2xl font-bold text-gray-900 mb-5">Tổng quan</Text>
           <View>
-            <MapView className='w-[500px] h-[250px]'/>
+          
           </View>
           <View className="flex-row mb-3 flex-wrap">
             {statsCards.slice(0, 2).map((card, index) => (
