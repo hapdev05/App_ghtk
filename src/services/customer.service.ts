@@ -78,7 +78,8 @@ export const getCustomerOrderDetails = async (orderId: number) => {
 
     console.log('✅ Get Customer Order Details Success:', {
       status: response.status,
-      orderId
+      orderId,
+      
     });
 
     return response.data;

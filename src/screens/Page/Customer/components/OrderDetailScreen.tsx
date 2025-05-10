@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { getCustomerOrderDetails } from '../../../../services/customer.service';
+import MapView, { Marker } from 'react-native-maps';
+import { forwardGeoCode } from '../../../../services/geocoding.service';
 
 interface OrderDetailRouteParams {
   orderId: number;
@@ -30,16 +32,45 @@ interface Order {
   description?: string;
 }
 
+interface Location {
+  lat: number;
+  long: number;
+}
+
 const OrderDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const params = route.params as OrderDetailRouteParams;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recipientLocation, setRecipientLocation] = useState<Location | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
   useEffect(() => {
     fetchOrderDetails();
   }, []);
+
+  useEffect(() => {
+    if (order?.recipient?.address) {
+      fetchRecipientLocation(order.recipient.address);
+    }
+  }, [order]);
+
+  const fetchRecipientLocation = async (address: string) => {
+    try {
+      setLoadingLocation(true);
+      const location = await forwardGeoCode(address);
+      if (location) {
+        setRecipientLocation(location);
+      } else {
+        console.log('Không thể chuyển đổi địa chỉ sang tọa độ');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy tọa độ từ địa chỉ:', error);
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
 
   const fetchOrderDetails = async () => {
     try {
@@ -153,8 +184,39 @@ const OrderDetailScreen = () => {
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-800">Chi tiết đơn hàng</Text>
       </View>
-
+      
       <ScrollView className="flex-1">
+        <View>
+          {recipientLocation ? (
+            <MapView 
+              className='w-full h-[270px]'
+              initialRegion={{
+                latitude: recipientLocation.lat,
+                longitude: recipientLocation.long,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: recipientLocation.lat,
+                  longitude: recipientLocation.long
+                }}
+                title="Địa chỉ người nhận"
+                description={order?.recipient.address}
+              />
+            </MapView>
+          ) : (
+            <View className="w-full h-[270px] bg-gray-200 justify-center items-center">
+              {loadingLocation ? (
+                <ActivityIndicator size="large" color="#3498db" />
+              ) : (
+                <Text className="text-gray-500">Không thể hiển thị bản đồ</Text>
+              )}
+            </View>
+          )}
+        </View>
+        
         <View className="p-4">
           <View className="mb-5 bg-white rounded-xl p-4 shadow-sm">
             <Text className="text-base font-bold text-gray-800 mb-3">Thông tin đơn hàng</Text>
