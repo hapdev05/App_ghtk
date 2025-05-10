@@ -11,7 +11,7 @@ import {
   Platform
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { forwardGeoCode } from '../../../services/geocoding.service';
+import { forwardGeoCode, reverseGeoCode } from '../../../services/geocoding.service';
 import { getDirections } from '../../../services/directions.service';
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
@@ -66,13 +66,13 @@ const LocationSearch = () => {
   const [distance, setDistance] = useState<number | null>(null);
   const [routeData, setRouteData] = useState<RouteData | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
-  
+  const [currentLocation, setCurrentLocation] = useState<string | null>(null);
   const navigation = useNavigation();
   const watchIdRef = useRef<number | null>(null);
   const mapRef = useRef<MapView | null>(null);
 
   useEffect(() => {
-    extractLocationFromLoginData();
+    // extractLocationFromLoginData();
 
     Geolocation.setRNConfiguration({
       skipPermissionRequests: false,
@@ -109,43 +109,40 @@ const LocationSearch = () => {
     return value * Math.PI / 180;
   };
 
-  const extractLocationFromLoginData = () => {
+  useEffect(() => {
+    Geolocation.getCurrentPosition(position => {
+      if (position.coords) {
+        fetchLocationAddress(position.coords.latitude, position.coords.longitude);
+      }
+    });
+  }, []);
+  
+  const fetchLocationAddress = async (lat: number, long: number) => {
     try {
-      // Dữ liệu mẫu - trong ứng dụng thực, bạn sẽ lấy dữ liệu này từ API hoặc Redux store
-      const locationData: LocationResult = {
-        "address": "1600 Amphitheatre Pkwy, Mountain View, CA 94043-1351, United States",
-        "city": "Mountain View",
-        "country": "United States",
-        "items": [{
-          "position": {
-            "lat": 37.422131,
-            "lng": -122.084801
-          },
-          "title": "1600 Amphitheatre Pkwy, Mountain View, CA 94043-1351, United States"
-        }],
-        "postalCode": "94043-1351"
-      };
-      
-      if (locationData && locationData.items && locationData.items.length > 0) {
-        const position = locationData.items[0].position;
+      const result = await reverseGeoCode({ lat, long });
+      if (result) {
+        setCurrentLocation(result.address);
+        setCurrentAddress(result.address);
+        // Lưu vị trí hiện tại của shipper
+        const newLocation = { lat, long };
+        setShipperLocation(newLocation);
         
-        if (position && position.lat && position.lng) {
-          const shipperPos: Location = {
-            lat: position.lat,
-            long: position.lng
-          };
-          
-          setShipperLocation(shipperPos);
-          setCurrentAddress(locationData.address);
-          
-          console.log('Vị trí shipper từ dữ liệu đăng nhập:', shipperPos);
+        // Cập nhật vị trí trên bản đồ
+        if (mapRef.current) {
+          mapRef.current.animateToRegion({
+            latitude: lat,
+            longitude: long,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005
+          }, 1000);
         }
+        
+        console.log('Current location:', result);
       }
     } catch (error) {
-      console.error('Lỗi khi xử lý dữ liệu vị trí:', error);
+      console.error('Error getting location address:', error);
     }
   };
-
   const startLocationTracking = () => {
     if (watchIdRef.current !== null) {
       stopLocationTracking();
