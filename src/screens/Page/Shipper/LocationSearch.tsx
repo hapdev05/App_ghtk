@@ -13,6 +13,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { forwardGeoCode, reverseGeoCode } from '../../../services/geocoding.service';
 import { getDirections } from '../../../services/directions.service';
+import { updateShipperLocation } from '../../../services/shipper.service';
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import Geolocation from '@react-native-community/geolocation';
@@ -127,6 +128,9 @@ const LocationSearch = () => {
         const newLocation = { lat, long };
         setShipperLocation(newLocation);
         
+        // Cập nhật vị trí lên server
+        await updateShipperLocation(lat, long);
+        
         // Cập nhật vị trí trên bản đồ
         if (mapRef.current) {
           mapRef.current.animateToRegion({
@@ -165,6 +169,11 @@ const LocationSearch = () => {
           
           setShipperLocation(newLocation);
           setAccuracy(posAccuracy);
+          
+          // Cập nhật vị trí shipper lên server
+          updateShipperLocation(latitude, longitude).catch(err => {
+            console.error('Lỗi khi cập nhật vị trí lên server:', err);
+          });
           
           // Cập nhật khoảng cách nếu đang hiển thị tuyến đường
           if (showRoute && location) {

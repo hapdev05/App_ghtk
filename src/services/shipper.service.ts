@@ -97,3 +97,42 @@ export const getOrderDetails = async (orderId: number) => {
     throw new Error(error.response?.data?.error || error.message || 'Không thể lấy chi tiết đơn hàng');
   }
 };
+
+// Cập nhật vị trí hiện tại của shipper lên server
+export const updateShipperLocation = async (lat: number, long: number) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập để cập nhật vị trí');
+    }
+
+    const response = await axios.put(
+      `${API_URL}/shipper/location/current`,
+      { 
+        latitude: lat, 
+        longitude: long,
+        timestamp: new Date().toISOString()
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status >= 400) {
+      throw new Error(response.data.message || 'Lỗi khi cập nhật vị trí');
+    }
+
+    console.log('✅ Update Shipper Location Success:', {
+      status: response.status,
+      location: { lat, long }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error updating shipper location:', error);
+    // Không throw error để tránh làm crash app khi cập nhật vị trí
+    return null;
+  }
+};
