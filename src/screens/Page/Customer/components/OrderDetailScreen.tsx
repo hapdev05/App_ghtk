@@ -465,7 +465,7 @@ const OrderDetailScreen = () => {
           </View>
         )}
         
-        <View className="p-4">
+        <View className="p-4 mt-20">
           <View className="mb-5 bg-white rounded-xl p-4 shadow-sm">
             <Text className="text-base font-bold text-gray-800 mb-3">Thông tin đơn hàng</Text>
             <View className="flex flex-row items-center mb-2">
