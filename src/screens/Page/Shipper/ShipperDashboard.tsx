@@ -5,10 +5,12 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Alert
+  Alert,
+  Image
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getShipperOrders } from "../../../services/shipper.service";
+import { getShipperInfo, ShipperInfo } from "../../../services/user.service";
 import ShipperOrderManagement from './ShipperOrderManagement';
 import { useNavigation } from '@react-navigation/native';
 import ShipperMenu from './ShipperMenu';
@@ -16,7 +18,7 @@ import { logout } from '../../../services/auth.service';
 import Geolocation from '@react-native-community/geolocation';
 import { reverseGeoCode } from '../../../services/geocoding.service';
 import MapView, { Marker } from 'react-native-maps';
-
+import avatar from '../../../assets/images/avatar.jpg'
 interface Order {
   orderId: number;
   orderName: string;
@@ -42,10 +44,12 @@ const ShipperDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string | null>(null);
+  const [shipperInfo, setShipperInfo] = useState<ShipperInfo | null>(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     loadOrders();
+    loadShipperInfo();
   }, []);
   
   useEffect(() => {
@@ -80,13 +84,36 @@ const ShipperDashboard = () => {
     }
   };
 
+  const loadShipperInfo = async () => {
+    try {
+      const info = await getShipperInfo();
+      setShipperInfo(info);
+      console.log('✅ Thông tin shipper:', info);
+    } catch (error) {
+      console.error('❌ Lỗi khi lấy thông tin shipper:', error);
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await loadOrders();
+    await loadShipperInfo();
     setRefreshing(false);
   };
 
   const getOrderStats = () => {
+    // Nếu có thông tin từ API, sử dụng thông tin đó
+    if (shipperInfo) {
+      return {
+        totalOrders: shipperInfo.totalOrders,
+        delivering: shipperInfo.deliveringOrders,
+        completed: shipperInfo.completedOrders,
+        // Tính toán doanh thu từ danh sách đơn hàng nếu có
+        totalRevenue: Array.isArray(orders) ? orders.reduce((sum, order) => sum + order.price, 0) : 0
+      };
+    }
+    
+    // Nếu không có thông tin từ API, sử dụng dữ liệu từ danh sách đơn hàng
     if (!orders || !Array.isArray(orders)) {
       return {
         totalOrders: 0,
@@ -185,10 +212,10 @@ const ShipperDashboard = () => {
       <View className="bg-white px-5 py-4 flex-row items-center justify-between border-b border-gray-200 shadow-sm">
         <View className="flex-row items-center">
           <View className="h-12 w-12 bg-blue-100 rounded-full items-center justify-center shadow-sm">
-            <MaterialIcons name="person" size={28} color="#3B82F6" />
+            <Image source={avatar} className="w-[60px] h-[60px] rounded-full" />
           </View>
           <View className="ml-4">
-            <Text className="text-xl font-bold text-gray-900"></Text>
+            <Text className="text-xl font-bold text-gray-900">{shipperInfo?.username || ''}</Text>
             <View className="flex-row items-center mt-1">
               <MaterialIcons name="local-shipping" size={18} color="#4B5563" />
               <Text className="text-gray-600 ml-2 text-base">Shipper</Text>

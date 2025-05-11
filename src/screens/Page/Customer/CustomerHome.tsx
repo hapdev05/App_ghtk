@@ -1,11 +1,32 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import AccountMenu from './components/AccountMenu'
-
+import { getCustomerInfo, CustomerInfo } from '../../../services/user.service'
+import AvtCus from '../../../assets/images/AvtCus.jpg'
 const CustomerHome = () => {
   const navigation = useNavigation<any>();
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Lấy thông tin khách hàng khi component mount
+    const fetchCustomerInfo = async () => {
+      try {
+        setLoading(true);
+        const info = await getCustomerInfo();
+        setCustomerInfo(info);
+        console.log('✅ Thông tin khách hàng:', info);
+      } catch (error) {
+        console.error('❌ Lỗi khi lấy thông tin khách hàng:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomerInfo();
+  }, []);
 
   const menuItems = [
     {
@@ -67,14 +88,14 @@ const CustomerHome = () => {
       <View className="bg-white px-4 py-6 shadow-sm">
         <View className="flex-row justify-between items-center">
           <View>
-            <Text className="text-2xl font-bold text-gray-800">Xin chào,</Text>
+            <Text className="text-2xl font-bold text-gray-800">Xin chào, {customerInfo?.username || 'Khách hàng'}</Text>
             <Text className="text-lg text-gray-600">Khách hàng</Text>
           </View>
           <TouchableOpacity 
             className="w-10 h-10 bg-gray-200 rounded-full justify-center items-center"
             onPress={() => setAccountMenuVisible(true)}
           >
-            <Text className="text-xl">👤</Text>
+            <Image source={AvtCus} className="w-[60px] h-[60px] rounded-full" />
           </TouchableOpacity>
         </View>
       </View>
@@ -83,11 +104,15 @@ const CustomerHome = () => {
       <View className="flex-row justify-between px-4 py-4">
         <View className="bg-white rounded-xl p-4 flex-1 mr-2 shadow-sm">
           <Text className="text-gray-500">Đơn hàng đang gửi</Text>
-          <Text className="text-xl font-bold text-blue-500">12</Text>
+          <Text className="text-xl font-bold text-blue-500">
+            {loading ? '...' : customerInfo?.pendingOrders || 0}
+          </Text>
         </View>
         <View className="bg-white rounded-xl p-4 flex-1 ml-2 shadow-sm">
           <Text className="text-gray-500">Đơn hoàn thành</Text>
-          <Text className="text-xl font-bold text-green-500">48</Text>
+          <Text className="text-xl font-bold text-green-500">
+            {loading ? '...' : customerInfo?.completedOrders || 0}
+          </Text>
         </View>
       </View>
 
