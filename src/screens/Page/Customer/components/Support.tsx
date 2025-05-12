@@ -22,7 +22,7 @@ const Support = () => {
         Linking.openURL('mailto:supportghtk@gmail.com');
         break;
       case 'facebook':
-        Linking.openURL('https://www.facebook.com/GHTK.VN/');
+        Linking.openURL('https://www.facebook.com/hoangphicungdz');
         break;
       default:
         break;

@@ -48,7 +48,7 @@ const AdminLayout = () => {
           tabBarBadge: 3,
         }}
       />
-      <Tab.Screen name="Settings" component={PlaceholderScreen} />
+      
     </Tab.Navigator>
   );
 };

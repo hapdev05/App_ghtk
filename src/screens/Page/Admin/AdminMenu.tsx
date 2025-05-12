@@ -11,11 +11,11 @@ type MenuItem = {
 };
 
 const menuItems: MenuItem[] = [
-  { id: 'users', title: 'User Management', icon: 'people-outline' },
-  { id: 'orders', title: 'Orders', icon: 'cart-outline' },
-  { id: 'delivery', title: 'Delivery', icon: 'bicycle-outline' },
-  { id: 'reports', title: 'Reports', icon: 'bar-chart-outline' },
-  { id: 'settings', title: 'Settings', icon: 'settings-outline' },
+  { id: 'users', title: 'Quản lí tài khoản', icon: 'people-outline' },
+  { id: 'orders', title: 'Quản lí đơn hàng', icon: 'cart-outline' },
+  { id: 'delivery', title: 'Quản lí giao hàng', icon: 'bicycle-outline' },
+  { id: 'reports', title: 'Báo cáo', icon: 'bar-chart-outline' },
+  { id: 'settings', title: 'Cài đặt', icon: 'settings-outline' },
 ];
 
 const AdminMenu = () => {
@@ -100,11 +100,11 @@ const AdminMenu = () => {
   return (
     <View className="flex-1 bg-gray-100 pt-10">
       <View className="bg-blue-600 p-4">
-        <Text className="text-2xl font-bold text-white mb-1">Admin Dashboard</Text>
-        <Text className="text-white text-opacity-80">Manage your application</Text>
+        <Text className="text-2xl font-bold text-white mb-1">Trang quản lí của Admin</Text>
+        <Text className="text-white text-opacity-80">Quản lí hệ thống</Text>
       </View>
 
-      <View className="px-4 -mt-4">
+      <View className="px-4 mt-5">
         <View className="flex-row flex-wrap justify-between">
           {menuItems.map((item) => (
             <TouchableOpacity
@@ -116,9 +116,7 @@ const AdminMenu = () => {
                 <Ionicons name={item.icon} size={24} color="#2563EB" />
               </View>
               <Text className="text-gray-900 font-semibold">{item.title}</Text>
-              <Text className="text-gray-500 text-sm mt-1">
-                View and manage {item.title.toLowerCase()}
-              </Text>
+             
             </TouchableOpacity>
           ))}
         </View>
