@@ -58,22 +58,7 @@ const ShipperMenu: React.FC<ShipperMenuProps> = ({ visible, onClose }) => {
         onClose();
       }
     },
-    {
-      icon: 'local-shipping',
-      title: 'Đơn hàng đang giao',
-      onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        onClose();
-      }
-    },
-    {
-      icon: 'history',
-      title: 'Lịch sử giao hàng',
-      onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        onClose();
-      }
-    },
+
     {
       icon: 'account-balance-wallet',
       title: 'Thông tin thanh toán',
@@ -83,18 +68,10 @@ const ShipperMenu: React.FC<ShipperMenuProps> = ({ visible, onClose }) => {
       }
     },
     {
-      icon: 'settings',
-      title: 'Cài đặt tài khoản',
-      onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        onClose();
-      }
-    },
-    {
       icon: 'help',
       title: 'Trợ giúp & Hỗ trợ',
       onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        navigation.navigate('Support' as never);
         onClose();
       }
     },

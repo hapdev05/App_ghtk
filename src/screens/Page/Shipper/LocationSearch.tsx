@@ -87,6 +87,7 @@ const LocationSearch = () => {
         watchIdRef.current = null;
       }
     };
+
   }, []);
 
   // Tính khoảng cách giữa hai điểm (km)
@@ -116,6 +117,7 @@ const LocationSearch = () => {
         fetchLocationAddress(position.coords.latitude, position.coords.longitude);
       }
     });
+    
   }, []);
   
   const fetchLocationAddress = async (lat: number, long: number) => {
