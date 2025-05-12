@@ -42,7 +42,7 @@ const AdminOrders = () => {
 
   const getFullPhotoUrl = (photoUrl: string) => {
     if (photoUrl.startsWith('http')) return photoUrl;
-    return `https://fa6e-2001-ee0-4b49-c580-bc32-ded9-8e98-e594.ngrok-free.app/data/img/${photoUrl}`;
+    return `https://605a-2001-ee0-4b49-c580-797a-942-f6d6-e6f2.ngrok-free.app/data/img/${photoUrl}`;
   };
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const AdminOrders = () => {
 
       <Text className="text-base text-gray-700 mb-1.5">Mã đơn: #{item.orderId}</Text>
       <Text className="text-base text-gray-700 mb-1.5">Người đặt: {item.username}</Text>
-      <Text className="text-base text-gray-700 mb-3">Giá: {item.price.toLocaleString()}đ</Text>
+      <Text className="text-base text-gray-700 mb-3">Giá: {item.price ? item.price.toLocaleString() : 0}đ</Text>
 
       <View className="flex flex-row justify-end items-center pt-2 border-t border-gray-100 border-solid">
         <TouchableOpacity

@@ -67,18 +67,10 @@ const AccountMenu: React.FC<AccountMenuProps> = ({ visible, onClose }) => {
       }
     },
     {
-      icon: 'settings',
-      title: 'Cài đặt tài khoản',
-      onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        onClose();
-      }
-    },
-    {
       icon: 'help',
       title: 'Trợ giúp & Hỗ trợ',
       onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        navigation.navigate('Support' as never);
         onClose();
       }
     },
