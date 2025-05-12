@@ -59,14 +59,6 @@ const AccountMenu: React.FC<AccountMenuProps> = ({ visible, onClose }) => {
       }
     },
     {
-      icon: 'location-on',
-      title: 'Địa chỉ của tôi',
-      onPress: () => {
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        onClose();
-      }
-    },
-    {
       icon: 'help',
       title: 'Trợ giúp & Hỗ trợ',
       onPress: () => {
