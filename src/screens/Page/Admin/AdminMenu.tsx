@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { logout } from '../../../services/auth.service';
+import { getDashboardStats } from '../../../services/admin.service';
 
 type MenuItem = {
   id: string;
@@ -14,12 +15,32 @@ const menuItems: MenuItem[] = [
   { id: 'users', title: 'Quản lí tài khoản', icon: 'people-outline' },
   { id: 'orders', title: 'Quản lí đơn hàng', icon: 'cart-outline' },
   { id: 'delivery', title: 'Quản lí giao hàng', icon: 'bicycle-outline' },
-  { id: 'reports', title: 'Báo cáo', icon: 'bar-chart-outline' },
+  { id: 'reports', title: 'Thống kê', icon: 'bar-chart-outline' },
   { id: 'settings', title: 'Cài đặt', icon: 'settings-outline' },
 ];
 
 const AdminMenu = () => {
   const navigation = useNavigation();
+  const [userCount, setUserCount] = useState<number>(0);
+  const [pendingOrderCount, setPendingOrderCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const stats = await getDashboardStats();
+      setUserCount(stats.totalUsers);
+      setPendingOrderCount(stats.pendingOrders);
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -123,22 +144,25 @@ const AdminMenu = () => {
       </View>
       <View className="mt-4 px-4">
         <Text className="text-lg font-semibold text-gray-900 mb-3">Quick Stats</Text>
-        <View className="bg-white rounded-xl p-4 shadow-sm">
+        <TouchableOpacity 
+          className="bg-white rounded-xl p-4 shadow-sm"
+          onPress={fetchDashboardStats}
+        >
           <View className="flex-row justify-between items-center mb-4">
             <View>
-              <Text className="text-gray-500">Total Users</Text>
-              <Text className="text-2xl font-bold text-gray-900">1,234</Text>
+              <Text className="text-gray-500">Tổng số tài khoản</Text>
+              <Text className="text-2xl font-bold text-gray-900">{userCount}</Text>
             </View>
             <Ionicons name="trending-up" size={24} color="#10B981" />
           </View>
           <View className="flex-row justify-between items-center">
             <View>
-              <Text className="text-gray-500">Active Orders</Text>
-              <Text className="text-2xl font-bold text-gray-900">56</Text>
+              <Text className="text-gray-500">Đơn hàng đang chờ</Text>
+              <Text className="text-2xl font-bold text-gray-900">{pendingOrderCount}</Text>
             </View>
             <Ionicons name="time-outline" size={24} color="#F59E0B" />
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

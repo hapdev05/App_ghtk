@@ -16,7 +16,7 @@ const AdminLayout = () => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
           switch (route.name) {
-            case 'Menu':
+            case 'Dashboard':
               iconName = focused ? 'home' : 'home-outline';
               break;
             case 'Users':
@@ -24,9 +24,6 @@ const AdminLayout = () => {
               break;
             case 'Orders':
               iconName = focused ? 'cart' : 'cart-outline';
-              break;
-            case 'Settings':
-              iconName = focused ? 'settings' : 'settings-outline';
               break;
             default:
               iconName = 'home-outline';
@@ -39,16 +36,28 @@ const AdminLayout = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Menu" component={AdminMenu} />
-      <Tab.Screen name="Users" component={AdminDashboard} />
+      <Tab.Screen 
+        name="Dashboard" 
+        component={AdminMenu}
+        options={{
+          title: 'Bảng điều khiển'
+        }}
+      />
+      <Tab.Screen 
+        name="Users" 
+        component={AdminDashboard}
+        options={{
+          title: 'Người dùng'
+        }}
+      />
       <Tab.Screen 
         name="Orders" 
         component={AdminOrders}
         options={{
-          tabBarBadge: 3,
+          title: 'Đơn hàng',
+          
         }}
       />
-      
     </Tab.Navigator>
   );
 };

@@ -34,6 +34,12 @@ export interface User {
   firebaseUid: string;
 }
 
+// Dashboard Statistics API
+export interface DashboardStats {
+  totalUsers: number;
+  pendingOrders: number;
+}
+
 // User Management APIs
 export const getAllUsers = async () => {
   try {
@@ -252,5 +258,33 @@ export const cancelOrder = async (orderId: number) => {
   } catch (error: any) {
     console.error('❌ Error canceling order:', error);
     throw new Error(error.response?.data?.error || error.message || 'Failed to cancel order');
+  }
+};
+
+export const getDashboardStats = async (): Promise<DashboardStats> => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('You are not logged in');
+    }
+
+    const response = await axios.get(`${API_URL}/dashboard/stats`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    console.log('✅ Get Dashboard Stats Success:', {
+      status: response.status,
+      data: response.data
+    });
+    
+    return {
+      totalUsers: response.data.totalUsers || 0,
+      pendingOrders: response.data.pendingOrders || 0
+    };
+  } catch (error: any) {
+    console.error('❌ Error getting dashboard stats:', error);
+    throw new Error(error.response?.data?.error || error.message || 'Failed to get dashboard statistics');
   }
 };
