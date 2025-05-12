@@ -14,7 +14,8 @@ import CreateOrder from '../screens/Page/Customer/components/CreateOrder';
 import OrderHistory from '../screens/Page/Customer/components/OrderHistory';
 import OrderDetailScreen from '../screens/Page/Customer/components/OrderDetailScreen';
 import LocationSearch from '../screens/Page/Shipper/LocationSearch';
-
+import Statistics from '../screens/Page/Customer/components/Statistics';
+import Support from '../screens/Page/Customer/components/Support';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -84,6 +85,16 @@ export default function AppNavigator() {
         <Stack.Screen
           name='LocationSearch'
           component={LocationSearch}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='Statistics'
+          component={Statistics}
+          options={{headerShown:false}}
+        />
+        <Stack.Screen
+          name='Support'
+          component={Support}
           options={{headerShown:false}}
         />
       </Stack.Navigator>

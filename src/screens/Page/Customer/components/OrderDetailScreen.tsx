@@ -542,7 +542,7 @@ const OrderDetailScreen = () => {
                 {order.packagePhotos.map((item, index) => (
                   <Image
                     key={`photo-${index}`}
-                    source={{ uri: item.startsWith('http') ? item : `https://fa6e-2001-ee0-4b49-c580-bc32-ded9-8e98-e594.ngrok-free.app/data/img/${item}` }}
+                    source={{ uri: item.startsWith('http') ? item : `https://605a-2001-ee0-4b49-c580-797a-942-f6d6-e6f2.ngrok-free.app/data/img/${item}` }}
                     className="w-60 h-60 rounded-lg mr-2"
                     resizeMode="cover"
                   />

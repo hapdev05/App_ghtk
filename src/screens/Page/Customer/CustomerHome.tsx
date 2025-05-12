@@ -1,15 +1,31 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar, Dimensions } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import AccountMenu from './components/AccountMenu'
 import { getCustomerInfo, CustomerInfo } from '../../../services/user.service'
+
+// Import các hình ảnh cho slider
+import promoImage1 from '../../../assets/images/slide1.jpg'
+import promoImage2 from '../../../assets/images/slide2.jpg'
+import promoImage3 from '../../../assets/images/slide3.jpg'
 import AvtCus from '../../../assets/images/AvtCus.jpg'
+
+const { width } = Dimensions.get('window');
+
 const CustomerHome = () => {
   const navigation = useNavigation<any>();
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const sliderRef = useRef<ScrollView>(null);
+  
+  const sliderImages = [
+    { id: 1, image: promoImage1, title: 'Giảm 50% phí vận chuyển' },
+    { id: 2, image: promoImage2, title: 'Đăng ký gói VIP' },
+    { id: 3, image: promoImage3, title: 'Sản phẩm mới ra mắt' },
+  ];
+  
   useEffect(() => {
     // Lấy thông tin khách hàng khi component mount
     const fetchCustomerInfo = async () => {
@@ -28,6 +44,35 @@ const CustomerHome = () => {
     fetchCustomerInfo();
   }, []);
 
+  useEffect(() => {
+    // Tự động chuyển slide mỗi 3 giây
+    const intervalId = setInterval(() => {
+      if (currentIndex < sliderImages.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        sliderRef.current?.scrollTo({
+          x: width * (currentIndex + 1),
+          animated: true,
+        });
+      } else {
+        setCurrentIndex(0);
+        sliderRef.current?.scrollTo({
+          x: 0,
+          animated: true,
+        });
+      }
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [currentIndex]);
+  
+  const handleScroll = (event: any) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(contentOffsetX / width);
+    if (newIndex !== currentIndex) {
+      setCurrentIndex(newIndex);
+    }
+  };
+
   const menuItems = [
     {
       id: 1,
@@ -45,27 +90,13 @@ const CustomerHome = () => {
     },
     {
       id: 3,
-      title: 'Đơn hàng chờ xử lý',
-      description: 'Quản lý đơn hàng đang chờ xử lý',
-      icon: '⏳',
-      screen: 'PendingOrders'
-    },
-    {
-      id: 4,
       title: 'Thống kê',
       description: 'Xem báo cáo và thống kê đơn hàng',
       icon: '📊',
       screen: 'Statistics'
     },
     {
-      id: 5,
-      title: 'Cài đặt tài khoản',
-      description: 'Quản lý thông tin tài khoản',
-      icon: '⚙️',
-      screen: 'AccountSettings'
-    },
-    {
-      id: 6,
+      id: 4,
       title: 'Hỗ trợ',
       description: 'Liên hệ với bộ phận hỗ trợ',
       icon: '🛟',
@@ -100,8 +131,49 @@ const CustomerHome = () => {
         </View>
       </View>
 
+      {/* Promotional Slider */}
+      <View className="px-4 pt-4">
+        <ScrollView
+          ref={sliderRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          {sliderImages.map((item) => (
+            <TouchableOpacity 
+              key={item.id} 
+              className="mr-2"
+              activeOpacity={0.9}
+              onPress={() => console.log(`Clicked promotion ${item.id}`)}
+            >
+              <View style={{ width: width - 40, height: 160 }} className="rounded-xl overflow-hidden">
+                <Image 
+                  source={item.image} 
+                  style={{ width: '100%', height: '100%' }}
+                  resizeMode="cover"
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        
+        {/* Indicators */}
+        <View className="flex-row justify-center mt-2 mb-3">
+          {sliderImages.map((_, index) => (
+            <View 
+              key={index} 
+              className={`h-2 w-2 rounded-full mx-1 ${
+                index === currentIndex ? 'bg-blue-500 w-4' : 'bg-gray-300'
+              }`} 
+            />
+          ))}
+        </View>
+      </View>
+
       {/* Quick Stats */}
-      <View className="flex-row justify-between px-4 py-4">
+      <View className="flex-row justify-between px-4 py-2">
         <View className="bg-white rounded-xl p-4 flex-1 mr-2 shadow-sm">
           <Text className="text-gray-500">Đơn hàng đang gửi</Text>
           <Text className="text-xl font-bold text-blue-500">
@@ -148,7 +220,7 @@ const CustomerHome = () => {
           <Text className="text-2xl">📦</Text>
           <Text className="text-xs text-gray-500">Đơn hàng</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
+        <TouchableOpacity className="items-center" onPress={() => navigation.navigate('Statistics')}>
           <Text className="text-2xl">📊</Text>
           <Text className="text-xs text-gray-500">Thống kê</Text>
         </TouchableOpacity>
