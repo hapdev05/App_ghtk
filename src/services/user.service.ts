@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://605a-2001-ee0-4b49-c580-797a-942-f6d6-e6f2.ngrok-free.app/api';
+const API_URL = 'https://47f6-42-96-4-215.ngrok-free.app/api';
 
 // Interface cho thông tin Customer
 export interface CustomerInfo {
