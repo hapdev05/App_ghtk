@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AdminMenu from './AdminMenu';
 import AdminDashboard from './AdminDashboard';
 import AdminOrders from './AdminOrders';
+import AdminReports from './AdminReports';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,6 +25,9 @@ const AdminLayout = () => {
               break;
             case 'Orders':
               iconName = focused ? 'cart' : 'cart-outline';
+              break;
+            case 'Reports':
+              iconName = focused ? 'bar-chart' : 'bar-chart-outline';
               break;
             default:
               iconName = 'home-outline';
@@ -55,7 +59,13 @@ const AdminLayout = () => {
         component={AdminOrders}
         options={{
           title: 'Đơn hàng',
-          
+        }}
+      />
+      <Tab.Screen 
+        name="Reports" 
+        component={AdminReports}
+        options={{
+          title: 'Thống kê'
         }}
       />
     </Tab.Navigator>

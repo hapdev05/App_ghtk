@@ -14,7 +14,6 @@ type MenuItem = {
 const menuItems: MenuItem[] = [
   { id: 'users', title: 'Quản lí tài khoản', icon: 'people-outline' },
   { id: 'orders', title: 'Quản lí đơn hàng', icon: 'cart-outline' },
-  { id: 'delivery', title: 'Quản lí giao hàng', icon: 'bicycle-outline' },
   { id: 'reports', title: 'Thống kê', icon: 'bar-chart-outline' },
   { id: 'settings', title: 'Cài đặt', icon: 'settings-outline' },
 ];
@@ -76,16 +75,12 @@ const AdminMenu = () => {
         navigation.navigate('Users' as never);
         break;
       case 'orders':
+        navigation.navigate('Orders' as never);
         // Chuyển đến trang quản lý đơn hàng
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
-        break;
-      case 'delivery':
-        // Chuyển đến trang quản lý giao hàng
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
         break;
       case 'reports':
         // Chuyển đến trang báo cáo
-        Alert.alert('Thông báo', 'Chức năng đang phát triển');
+        navigation.navigate('Reports' as never);
         break;
       case 'settings':
         // Hiển thị menu cài đặt với tùy chọn đăng xuất
